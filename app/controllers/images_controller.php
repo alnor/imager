@@ -2,30 +2,19 @@
 
 /*
  * Контроллер Images
- * 
  */
 
 class ImagesController extends AppController{
 	
 	var $uses = array('Image');
-	var $img=array();
-	
-	/*
-	 * Конструктор сканирует директорию и записывает содержимое в массив
-	 */
-	
-	function __construct(){
-		$dir = scandir("img");
-		$this->img = array_slice($dir, 2);		
-		parent::__construct();
-	}
 	
 	/*
 	 * Индексная страница устанавливает по умолчанию 1 картинку из массива
 	 */
 	
-	function index(){			
-		$this->set(array('image'=>$this->img[0], "id"=>0));
+	function index(){	
+		$ret = $this->Image->getImage(0);				
+		$this->set(array('image'=>$ret['index'], "id"=>$ret['id']));
 	}	
 	
 	/*
@@ -38,8 +27,8 @@ class ImagesController extends AppController{
 		$this->layout="ajax";
 		
 		if ($this->data):
-			$index = $this->nextIndex($this->data["index"]);
-			$this->set(array('image'=>$this->img[$index], "id"=>$index));
+			$ret = $this->Image->nextIndex($this->data["index"]);
+			$this->set(array('image'=>$ret['index'], "id"=>$ret['id']));
 			$this->render("index");
 		endif;	
 	}
@@ -54,39 +43,12 @@ class ImagesController extends AppController{
 		$this->layout="ajax";
 		
 		if ($this->data):
-			$index = $this->prevIndex($this->data["index"]);
-			$this->set(array('image'=>$this->img[$index], "id"=>$index));
+			$ret = $this->Image->prevIndex($this->data["index"]);
+			$this->set(array('image'=>$ret['index'], "id"=>$ret['id']));
 			$this->render("index");
 		endif;	
 	}	
-	
-	/*
-	 * Метод увеличивает индекс
-	 */
-	
-	private function nextIndex($index){
-		$ret = $index+1;
-		
-		if ($ret==count($this->img)):
-			return 0;
-		endif;
-		
-		return $ret;
-	}
-	
-	/*
-	 * Метод уменьшает индекс
-	 */
-	
-	private function prevIndex($index){
-		$ret = $index-1;
-		
-		if ($ret<0):
-			return count($this->img)-1;
-		endif;
-		
-		return $ret;
-	}	
+
 }
 
 ?>
